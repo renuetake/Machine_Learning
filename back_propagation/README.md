@@ -19,3 +19,9 @@
 1 0 0
 
 1 1 1
+
+「bp_test.py」は「bp.py」のエラー値をプロットするように改良したものです。
+実行すると以下のようなグラフがプロットされます。
+
+![error per epoch](https://github.com/renuetake/Machine_Learning/blob/develop/back_propagation/error_per_epoch.pdf)
+
