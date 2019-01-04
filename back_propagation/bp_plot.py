@@ -1,5 +1,6 @@
 import math
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 def read_data(path='data.dat'):
@@ -39,6 +40,7 @@ def init_net(num_input, num_hidden, num_output, seed=1):
     # 乱数シードの値を設定する
     np.random.seed(seed=seed)
 
+
     # 入力層~隠れ層の重みを(-0.5~0.5)の範囲で初期化
     weight1 = np.random.rand(num_input+1, num_hidden) - 0.5
     weight2 = np.random.rand(num_hidden+1, num_output) - 0.5
@@ -63,19 +65,19 @@ def feedforward(weight, data, isample, beta=0.8):
     if ((type(weight) != list) or (type(data) != np.ndarray) or (type(isample) != int)):
         raise ValueError
     if (weight[0] is int):
+        # print('入力された重みが不正です')
         raise ValueError
 
     X = []
     H = []
     Y = []
-
     # 入力層のユニット数だけ繰り返し
     for i in range(NUM_INPUT):
         # 入力層のそれぞれのユニットの出力は読み込んだデータと同じ
         X.append(data[isample][i])
     # 閾値用にX[NUM_INPUT] = 1.0にする
     X.append(1.0)
-    
+
     # 隠れ層のユニット数だけ繰り返し
     for i in range(NUM_HIDDEN):
         # 隠れ層のそれぞれのユニットの出力は、
@@ -86,10 +88,11 @@ def feedforward(weight, data, isample, beta=0.8):
             net_input = net_input + (weight[0][j][i] * X[j])
         # 加算された値をシグモイド関数に適用
         H.append((1.0 / (1.0 + np.exp(net_input * -beta))))
-    
     H.append(1.0)
     # 出力層のユニット数だけ繰り返し
     for i in range(NUM_OUTPUT):
+        # 出力層のそれぞれのユニットの出力は、
+        # そのユニットに入力された値の総和をシグモイド関数に入れて計算される
         net_input = 0
         for j in range(NUM_HIDDEN+1):
             net_input = net_input + (weight[1][j][i] * H[j])
@@ -137,13 +140,13 @@ def modify_weights(weight, out, back, epsilon=0.05):
     # 入力された型が正常か判定
     if ((type(weight) != list) or (type(back) != list) or (type(epsilon) != float)):
         raise ValueError
+
     for i in range(NUM_INPUT+1):
         for j in range(NUM_HIDDEN):
             weight[0][i][j] = weight[0][i][j] + epsilon * out[0][i] * back[0][j]
     for i in range(NUM_HIDDEN+1):
         for j in range(NUM_OUTPUT):
             weight[1][i][j] = weight[1][i][j] + epsilon * out[1][i] * back[1][j]
-
 def print_results(isample, out, data, error):
     """
     学習結果をプリントする
@@ -181,6 +184,31 @@ def calc_error(isample, data, out):
 
     return error
 
+def plot_error(error):
+    """
+    エラー値の推移をプロットする
+    input:
+        error: リスト 毎epochのエラー値が格納されたリスト
+    output:
+        なし
+    """
+
+    # グラフタイトルの設定
+    plt.title('error per epoch')
+
+    # 縦軸・横軸のラベル設定
+    plt.xlabel('epochs')
+    plt.ylabel('error')
+    
+    # プロット
+    plt.plot(error, label="error_value")
+
+    # 凡例の表示
+    plt.legend()
+
+    # PDFファイルに書き出し
+    plt.savefig('error_per_epoch.pdf')
+
 if __name__ == '__main__':
     NUM_LEARN = 50000           # 学習の繰り返し回数
     NUM_SAMPLE = 4              # サンプル数
@@ -191,11 +219,13 @@ if __name__ == '__main__':
     global NUM_OUTPUT              # 出力層のユニット数
     NUM_OUTPUT = 1
     THRESHOLD_ERROR = 0.001     # 学習誤差がこの値以下になるとプログラムが停止する
-
+    error_list = []             # 毎epochエラー値を格納するリスト。プロットの時に使用。
     # 入出力データの読み込み
     data = read_data()
+    # print(data)
     # ネットワークの重みの初期化
     weight = init_net(NUM_INPUT, NUM_HIDDEN, NUM_OUTPUT)
+    # print(weight)
     # 学習の繰り返しループ
     for ilearn in range(NUM_LEARN):
         if (ilearn % 1000) == 0:
@@ -211,12 +241,15 @@ if __name__ == '__main__':
                 print_results(isample, out, data, error)
             
             back = backward(weight, data, isample, out)
-            modify_weights(weight, out, back, epsilon=0.1)
+            modify_weights(weight, out, back, epsilon=0.15)
         
         if (error < THRESHOLD_ERROR):
             break
+        error_list.append(error)
     
     print("\n\n# of learning : {}\n".format(ilearn))
     for i in range(NUM_SAMPLE):
         out = feedforward(weight, data, i)
         print_results(i, out, data, calc_error(i, data, out))
+
+    plot_error(error_list)
