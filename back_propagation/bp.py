@@ -1,8 +1,13 @@
 import math
 import numpy as np
+import os
 
+# パスの設定
+DIR = os.getcwd()
+if (DIR.split('/')[-1] != 'back_propagation'):
+    DIR = DIR + '/back_propagation'
 
-def read_data(path='data.dat'):
+def read_data(path='/data.dat'):
     """
     入力データと教師データが格納されている「data.dat」を開き、
     それぞれのデータをnumpy配列に格納して返す。
@@ -13,6 +18,7 @@ def read_data(path='data.dat'):
     output:
         data: np.array
     """
+    path = DIR + '/' + path
     try:
         data = np.loadtxt(path, delimiter=' ')
     except OSError:
@@ -211,7 +217,7 @@ if __name__ == '__main__':
                 print_results(isample, out, data, error)
             
             back = backward(weight, data, isample, out)
-            modify_weights(weight, out, back, epsilon=0.1)
+            modify_weights(weight, out, back, epsilon=0.15)
         
         if (error < THRESHOLD_ERROR):
             break

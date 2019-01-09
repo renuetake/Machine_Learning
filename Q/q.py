@@ -366,6 +366,7 @@ if __name__ == '__main__':
         agent.move_state(maze)
         istep += 1
         if (agent.current_pos == GOAL_POS) | (istep == NUM_STEP):
+            agent_log.append(agent.current_pos)
             break
     show_map(maze)
     plot_result(ROW, COL, np.array(agent_log))
