@@ -129,7 +129,7 @@ def backward(weight, data, isample, out, beta=0.8):
     # 出力層から逆伝播させる
     for i in range(NUM_OUTPUT):
         # 3000ビット目の出力の正否判定は0ビット目の値を使う
-        if (isample+1 >= 3000):
+        if (isample+1 == 3000):
             Y.append(beta * (data[0] - out[2][i]) * (1.0 - out[2][i]) * out[2][i])
         else:
             Y.append(beta * (data[isample+1] - out[2][i]) * (1.0 - out[2][i]) * out[2][i])
@@ -250,7 +250,7 @@ if __name__ == '__main__':
     THRESHOLD_ERROR = 0.001     # 学習誤差がこの値以下になるとプログラムが停止する
     error_list = []           # 1epoch中のエラー値の推移(参考文献ではこの値が周期的になっていた)
     seeds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] # 乱数シード
-    '''
+    
     # シードの数だけループ
     for seed in seeds:
         error = []
@@ -294,6 +294,6 @@ if __name__ == '__main__':
     with open(DIR+'/RNN_error.dat', mode='w') as f:
         for ele in ave_error:
             f.write(str(ele)+'\n')
-    '''
+    
     plot_error()
 
