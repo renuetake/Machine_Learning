@@ -45,13 +45,3 @@ $ docker exec -ti machine_learning_01 python <filename.py>
 # bashの実行
 $ docker exec -ti machine_learning_01 bash
 ```
-
-
-## Install Test
-
-パッケージが正しくインストールされているかのテスト
-```
-$ docker exec -ti machine_learning_01 bash
-$ cd test
-$ python installtest.py
-```
